@@ -1,14 +1,11 @@
 import gradio as gr
 
-# 输入name字符串，输出Hello {name}!字符串
-def greet(name):
-    return "Hello " + name + "!"
-
-demo = gr.Interface(
-    fn=greet,
-    inputs=gr.Textbox(lines=2, placeholder="Name Here..."),
-    outputs="text",
-    allow_flagging="never",
-)
-if __name__ == "__main__":
-    demo.launch()
+def combine(a, b):
+    return a + " " + b
+with gr.Blocks() as demo:
+    txt = gr.Textbox(label="Input", lines=2)
+    txt_2 = gr.Textbox(label="Input 2")
+    txt_3 = gr.Textbox(value="", label="Output")
+    btn = gr.Button(value="Submit")
+    btn.click(combine, inputs=[txt, txt_2], outputs=[txt_3])
+demo.launch()
