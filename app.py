@@ -1,12 +1,14 @@
 import gradio as gr
 
-def greet(name, intensity):
-    return "Hello " * intensity + name + "!"
+# 输入name字符串，输出Hello {name}!字符串
+def greet(name):
+    return "Hello " + name + "!"
 
 demo = gr.Interface(
     fn=greet,
-    inputs=["text", "slider"],
-    outputs=["text"],
+    inputs=gr.Textbox(lines=2, placeholder="Name Here..."),
+    outputs="text",
+    allow_flagging="never",
 )
-
-demo.launch()
+if __name__ == "__main__":
+    demo.launch()
