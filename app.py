@@ -1,7 +1,7 @@
 import gradio as gr
 
 def combine(a, b):
-    return a + " " + b
+    return ""
 with gr.Blocks() as demo:
     txt = gr.Textbox(label="Input", lines=2)
     txt_2 = gr.Textbox(label="Input 2")
