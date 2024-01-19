@@ -1,11 +1,13 @@
 import gradio as gr
+import os
 
-def combine(a, b):
-    return ""
-with gr.Blocks() as demo:
-    txt = gr.Textbox(label="Input", lines=2)
-    txt_2 = gr.Textbox(label="Input 2")
-    txt_3 = gr.Textbox(value="", label="Output")
-    btn = gr.Button(value="Submit")
-    btn.click(combine, inputs=[txt, txt_2], outputs=[txt_3])
-demo.launch()
+# 输入一张图片，旋转45°后输出
+def image_mod(image):
+    return image.rotate(45)
+
+
+demo = gr.Interface(image_mod, gr.Image(type="pil"), "image",
+    allow_flagging="never")
+
+if __name__ == "__main__":
+    demo.launch()
