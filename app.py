@@ -1,5 +1,7 @@
 import os
-os.system("lmdeploy serve gradio internlm/internlm-chat-7b-v1_1 --model-name internlm-chat-7b")
+from openxlab.model import download
+download(model_repo='OpenLMLab/internlm2-chat-7b', output='internlm2-chat-7b')
+os.system("lmdeploy serve gradio internlm2-chat-7b --model-name internlm2-chat-7b")
 # import gradio as gr
 # import random
 # import time
