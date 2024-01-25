@@ -9,12 +9,7 @@ if xlab==1:
 from dataclasses import asdict
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers.utils import logging
-
 from tools.transformers.interface import GenerationConfig, generate_interactive
-
-logger = logging.get_logger(__name__)
-
 import gradio as gr
 
 def load_model():
@@ -22,9 +17,7 @@ def load_model():
     if xlab==1:
         model_name_or_path = "/home/xlab-app-center/internlm2-chat-7b"
     model = (
-        AutoModelForCausalLM.from_pretrained(model_name_or_path, trust_remote_code=True)
-        # .to(torch.bfloat16)
-        # .cuda()
+        AutoModelForCausalLM.from_pretrained(model_name_or_path, trust_remote_code=True).to(torch.bfloat16).cuda()
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
     return model, tokenizer
