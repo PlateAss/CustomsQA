@@ -4,7 +4,7 @@ if os.path.isdir("/home/xlab-app-center"):
     xlab=1
 from openxlab.model import download
 if xlab==1:
-    download(model_repo='OpenLMLab/internlm2-chat-7b', output='/home/xlab-app-center/internlm2-chat-7b')
+    download(model_repo='OpenLMLab/internlm-chat-7b', output='/home/xlab-app-center/internlm-chat-7b')
 # os.system("lmdeploy serve gradio /home/xlab-app-center/internlm-chat-7b --model-name internlm-chat-7b --server-port 7860")
 from dataclasses import asdict
 import torch
@@ -15,7 +15,7 @@ import gradio as gr
 def load_model():
     model_name_or_path = "/root/share/model_repos/internlm-chat-7b"
     if xlab==1:
-        model_name_or_path = "/home/xlab-app-center/internlm2-chat-7b"
+        model_name_or_path = "/home/xlab-app-center/internlm-chat-7b"
     model = (AutoModelForCausalLM.from_pretrained(model_name_or_path, trust_remote_code=True)
     # .to(torch.bfloat16)
     .cuda())
