@@ -3,3 +3,4 @@ lmdeploy[serve]
 dataclasses
 torch
 transformers
+einops
