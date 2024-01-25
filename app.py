@@ -17,7 +17,7 @@ def load_model():
     if xlab==1:
         model_name_or_path = "/home/xlab-app-center/internlm-chat-7b"
     model = (AutoModelForCausalLM.from_pretrained(model_name_or_path, trust_remote_code=True)
-    # .to(torch.bfloat16)
+    .to(torch.bfloat16)
     .cuda())
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
     return model, tokenizer
