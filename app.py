@@ -1,17 +1,21 @@
 import os
 xlab=0
-modelname="internlm2-chat-7b"
+modelname="internlm2-chat-7b-4bits"
 modelpath=[f"/root/share/model_repos/{modelname}",f"/home/xlab-app-center/{modelname}"]
 if os.path.isdir("/home/xlab-app-center"):
     xlab=1
 from openxlab.model import download
 if xlab==1:
-    download(model_repo=f'OpenLMLab/{modelname}', output=modelpath[xlab])
-    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bits")
-    os.system(f"lmdeploy serve gradio {modelpath[xlab]}-4bits --model-name {modelname}-4bits --server-port 7860 --model-format awq --backend turbomind")
+    if os.path.isdir(f"./{modelname}")==False:
+        download(model_repo=f'OpenLMLab/{modelname}', output=modelpath[xlab])
+        os.system(f"lmdeploy convert {modelpath[xlab]} ./{modelname}-turbomind")
+        #os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bits")
+    os.system(f"lmdeploy serve gradio {modelpath[xlab]}-turbomind --server-port 7860 --model-format awq --backend turbomind")
 else:
-    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bits")
-    os.system(f"lmdeploy serve gradio ./{modelname}-4bits --model-name {modelname}-4bits --server-port 7860 --model-format awq --backend turbomind")
+    if os.path.isdir(f"./{modelname}")==False:
+        os.system(f"lmdeploy convert {modelpath[xlab]} ./{modelname}")
+        #os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bits")
+    os.system(f"lmdeploy serve gradio ./{modelname} --server-port 7860 --model-format awq --backend turbomind")
 import lmdeploy
 lmdeploy.TurbomindEngineConfig
 # from dataclasses import asdict
