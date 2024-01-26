@@ -1,11 +1,16 @@
 import os
 xlab=0
+modelname="internlm2-chat-7b"
+modelpath=[f"/root/share/model_repos/{modelname}",f"/home/xlab-app-center/{modelname}"]
 if os.path.isdir("/home/xlab-app-center"):
     xlab=1
 from openxlab.model import download
 if xlab==1:
-    download(model_repo='OpenLMLab/internlm2-chat-7b', output='/home/xlab-app-center/internlm2-chat-7b')
-os.system("lmdeploy serve gradio /home/xlab-app-center/internlm2-chat-7b --model-name internlm2-chat-7b --server-port 7860")
+    download(model_repo=f'OpenLMLab/{modelname}', output=modelpath[xlab])
+    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bit")
+    os.system(f"lmdeploy serve gradio {modelpath[xlab]}-4bit --model-name {modelname}-4bit --server-port 7860 --model-format awq")
+else:
+    os.system("lmdeploy serve gradio {modelpath[xlab]} --model-name {modelname} --server-port 7860")
 # from dataclasses import asdict
 # import torch
 # from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -13,11 +18,9 @@ os.system("lmdeploy serve gradio /home/xlab-app-center/internlm2-chat-7b --model
 # import gradio as gr
 
 # def load_model():
-#     model_name_or_path = "/root/share/model_repos/internlm-chat-7b"
-#     if xlab==1:
-#         model_name_or_path = "/home/xlab-app-center/internlm-chat-7b"
+#     model_name_or_path = modelpath[xlab]
 #     model = (AutoModelForCausalLM.from_pretrained(model_name_or_path, trust_remote_code=True)
-#     .to(torch.bfloat16)
+#     .to(torch.float16)
 #     .cuda())
 #     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
 #     return model, tokenizer
