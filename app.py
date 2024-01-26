@@ -10,7 +10,10 @@ if xlab==1:
     os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bit")
     os.system(f"lmdeploy serve gradio {modelpath[xlab]}-4bit --model-name {modelname}-4bit --server-port 7860 --model-format awq")
 else:
-    os.system("lmdeploy serve gradio {modelpath[xlab]} --model-name {modelname} --server-port 7860")
+    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bit")
+    os.system(f"lmdeploy serve gradio ./{modelname}-4bit --model-name {modelname}-4bit --server-port 7860 --model-format awq")
+import lmdeploy
+lmdeploy.TurbomindEngineConfig
 # from dataclasses import asdict
 # import torch
 # from transformers import AutoModelForCausalLM, AutoTokenizer
