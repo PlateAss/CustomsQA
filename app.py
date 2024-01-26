@@ -1,6 +1,6 @@
 import os
 xlab=0
-modelname="internlm2-chat-7b-4bits"
+modelname="internlm2-chat-7b"
 modelpath=[f"/root/share/model_repos/{modelname}",f"/home/xlab-app-center/{modelname}"]
 if os.path.isdir("/home/xlab-app-center"):
     xlab=1
