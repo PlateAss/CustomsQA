@@ -4,7 +4,7 @@ if os.path.isdir("/home/xlab-app-center"):
     xlab=1
 from openxlab.model import download
 if xlab==1:
-    download(model_repo='OpenLMLab/internlm-chat-7b', output='/home/xlab-app-center/internlm2-chat-7b')
+    download(model_repo='OpenLMLab/internlm2-chat-7b', output='/home/xlab-app-center/internlm2-chat-7b')
 os.system("lmdeploy serve gradio /home/xlab-app-center/internlm2-chat-7b --model-name internlm2-chat-7b --server-port 7860")
 # from dataclasses import asdict
 # import torch
