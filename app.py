@@ -7,7 +7,7 @@ if os.path.isdir("/home/xlab-app-center"):
 from openxlab.model import download
 if xlab==1:
     if os.path.isdir(f"./{modelname}")==False:
-        download(model_repo=f'OpenLMLab/{modelname}', output=modelpath[xlab]-temp)
+        download(model_repo=f'OpenLMLab/{modelname}', output=f"{modelpath[xlab]}-temp")
         os.system(f"lmdeploy convert {modelpath[xlab]}-temp {modelname}")
         #os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bits")
     os.system(f"lmdeploy serve gradio {modelpath[xlab]} --server-port 7860 --model-format awq --backend turbomind")
