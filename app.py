@@ -7,11 +7,11 @@ if os.path.isdir("/home/xlab-app-center"):
 from openxlab.model import download
 if xlab==1:
     download(model_repo=f'OpenLMLab/{modelname}', output=modelpath[xlab])
-    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bit")
-    os.system(f"lmdeploy serve gradio {modelpath[xlab]}-4bit --model-name {modelname}-4bit --server-port 7860 --model-format awq")
+    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bits")
+    os.system(f"lmdeploy serve gradio {modelpath[xlab]}-4bits --model-name {modelname}-4bits --server-port 7860 --model-format awq")
 else:
-    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bit")
-    os.system(f"lmdeploy serve gradio ./{modelname}-4bit --model-name {modelname}-4bit --server-port 7860 --model-format awq")
+    os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bits")
+    os.system(f"lmdeploy serve gradio ./{modelname}-4bits --model-name {modelname}-4bits --server-port 7860 --model-format awq")
 import lmdeploy
 lmdeploy.TurbomindEngineConfig
 # from dataclasses import asdict
