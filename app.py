@@ -6,18 +6,16 @@ if os.path.isdir("/home/xlab-app-center"):
     xlab=1
 from openxlab.model import download
 if xlab==1:
-    if os.path.isdir(f"./{modelname}")==False:
-        download(model_repo=f'OpenLMLab/{modelname}', output=f"{modelpath[xlab]}-temp")
-        os.system(f"lmdeploy convert {modelpath[xlab]}-temp {modelname}")
+    if os.path.isdir(f"{modelpath[xlab]}")==False:
+        download(model_repo=f'OpenLMLab/{modelname}', output=f"{modelpath[xlab]}")
+        os.system(f"lmdeploy convert {modelpath[xlab]} ./{modelname}")
         #os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir {modelpath[xlab]}-4bits")
-    os.system(f"lmdeploy serve gradio {modelpath[xlab]} --server-port 7860 --model-format awq --backend turbomind")
+    os.system(f"lmdeploy serve gradio ./{modelname} --server-port 7860 --model-format awq --backend turbomind")
 else:
     if os.path.isdir(f"./{modelname}")==False:
         os.system(f"lmdeploy convert {modelpath[xlab]} ./{modelname}")
         #os.system(f"lmdeploy lite auto_awq {modelpath[xlab]} --work-dir ./{modelname}-4bits")
     os.system(f"lmdeploy serve gradio ./{modelname} --server-port 7860 --model-format awq --backend turbomind")
-import lmdeploy
-lmdeploy.TurbomindEngineConfig
 # from dataclasses import asdict
 # import torch
 # from transformers import AutoModelForCausalLM, AutoTokenizer
