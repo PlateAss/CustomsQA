@@ -4,3 +4,4 @@ dataclasses
 torch
 transformers
 einops
+python-Levenshtein
