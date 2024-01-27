@@ -15,7 +15,7 @@ else:
     if os.path.isdir(f"./{modelName}-4bits")==False:        
         os.system(f"lmdeploy lite auto_awq {modelpath[xLab]} --work-dir ./{modelName}-4bits")
     # os.system(f"lmdeploy serve gradio ./{modelName}-4bits --server-port 7860 --model-format awq --backend turbomind")
-if os.path.isdir(f"{modelpath[xLab]}")==False:
+if os.path.isdir(f"{sentencePath[xLab]}")==False:
     os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
     os.system(f'huggingface-cli download --resume-download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 --local-dir {sentencePath[xLab]}')
 
