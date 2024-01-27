@@ -8,3 +8,4 @@ python-Levenshtein
 langchain
 huggingface_hub
 sentence-transformers
+chromadb
