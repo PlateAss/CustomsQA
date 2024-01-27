@@ -38,9 +38,11 @@ def combine_history(history):
 tm_model = tm.TurboMind.from_pretrained(f"{modelName}-4bits", model_name=modelName,trust_remote_code=True)
 generator = tm_model.create_instance()
 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3']=sys.modules.pop('pysqlite3')
 from langchain.vectorstores import Chroma
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-
 
 # 定义 Embeddings
 embeddings = HuggingFaceEmbeddings(model_name=sentencePath[xLab])
