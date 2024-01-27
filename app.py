@@ -63,14 +63,6 @@ class InternLM_LLM(LLM):
                 run_manager: Optional[CallbackManagerForLLMRun] = None,
                 **kwargs: Any):
         # 重写调用函数
-        system_prompt = """You are an AI assistant whose name is InternLM (书生·浦语).
-        - InternLM (书生·浦语) is a conversational language model that is developed by Shanghai AI Laboratory (上海人工智能实验室). It is designed to be helpful, honest, and harmless.
-        - InternLM (书生·浦语) can understand and communicate fluently in the language chosen by the user such as English and 中文.
-        """
-        
-        # messages = [(system_prompt, '')]
-        # response, history = generator.chat(self.tokenizer, prompt , history=messages)
-
         prompt_t = tm_model.model.get_prompt(prompt)
         input_ids = tm_model.tokenizer.encode(prompt_t)
         for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
@@ -103,7 +95,7 @@ QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context","question"],template
 qa_chain = RetrievalQA.from_chain_type(llm,retriever=vectordb.as_retriever(),return_source_documents=True,chain_type_kwargs={"prompt":QA_CHAIN_PROMPT})
 
 import gradio as gr
-with gr.Blocks(title="海关问答") as demo:    
+with gr.Blocks(title="通关问答") as demo:    
     chatbot = gr.Chatbot(show_label=False)
     with gr.Row():
         with gr.Column(scale=5):
