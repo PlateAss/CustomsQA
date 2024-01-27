@@ -33,8 +33,7 @@ def combine_history(history):
 
 tm_model = tm.TurboMind.from_pretrained(f"{modelName}-4bits", model_name=modelName,trust_remote_code=True)
 generator = tm_model.create_instance()
-with gr.Blocks() as demo:
-    gr.Label("海关问答",show_label=False)
+with gr.Blocks(title="海关问答") as demo:
     chatbot = gr.Chatbot(show_label=False)
     with gr.Row():
         with gr.Column(scale=5):
