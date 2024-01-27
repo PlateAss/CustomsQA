@@ -2,6 +2,7 @@ import os
 xLab=0
 modelName="internlm2-chat-7b"
 modelpath=[f"/root/share/model_repos/{modelName}",f"/home/xlab-app-center/{modelName}"]
+sentencePath=["/root/data/model/sentence-transformer","/home/xlab-app-center/sentence-transformer"]
 if os.path.isdir("/home/xlab-app-center"):
     xLab=1
 from openxlab.model import download
@@ -15,8 +16,9 @@ else:
         os.system(f"lmdeploy lite auto_awq {modelpath[xLab]} --work-dir ./{modelName}-4bits")
     # os.system(f"lmdeploy serve gradio ./{modelName}-4bits --server-port 7860 --model-format awq --backend turbomind")
 
+
 from lmdeploy import turbomind as tm
-import gradio as gr
+
 user_prompt = "<|User|>:{user}\n"
 robot_prompt = "<|Bot|>:{robot}<eoa>\n"
 cur_query_prompt = "<|User|>:{user}<eoh>\n<|Bot|>:"
@@ -33,7 +35,73 @@ def combine_history(history):
 
 tm_model = tm.TurboMind.from_pretrained(f"{modelName}-4bits", model_name=modelName,trust_remote_code=True)
 generator = tm_model.create_instance()
-with gr.Blocks(title="海关问答") as demo:
+
+from langchain.vectorstores import Chroma
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+
+if os.path.isdir(f"{modelpath[xLab]}")==False:
+    os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+    os.system(f'huggingface-cli download --resume-download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 --local-dir {sentencePath[xLab]}')
+# 定义 Embeddings
+embeddings = HuggingFaceEmbeddings(model_name=sentencePath[xLab])
+# 加载数据库
+vectordb = Chroma(persist_directory='./chroma', embedding_function=embeddings)
+
+from langchain.llms.base import LLM
+from typing import Any, List, Optional
+from langchain.callbacks.manager import CallbackManagerForLLMRun
+class InternLM_LLM(LLM):
+
+    def __init__(self):
+        # model_path: InternLM 模型路径
+        # 从本地初始化模型
+        super().__init__()
+
+    def _call(self, prompt : str, stop: Optional[List[str]] = None,
+                run_manager: Optional[CallbackManagerForLLMRun] = None,
+                **kwargs: Any):
+        # 重写调用函数
+        system_prompt = """You are an AI assistant whose name is InternLM (书生·浦语).
+        - InternLM (书生·浦语) is a conversational language model that is developed by Shanghai AI Laboratory (上海人工智能实验室). It is designed to be helpful, honest, and harmless.
+        - InternLM (书生·浦语) can understand and communicate fluently in the language chosen by the user such as English and 中文.
+        """
+        
+        # messages = [(system_prompt, '')]
+        # response, history = generator.chat(self.tokenizer, prompt , history=messages)
+
+        prompt_t = tm_model.model.get_prompt(prompt)
+        input_ids = tm_model.tokenizer.encode(prompt_t)
+        for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
+            response = tm_model.tokenizer.decode(outputs[1])            
+        return response
+        
+    @property
+    def _llm_type(self) -> str:
+        return "InternLM"
+    
+llm = InternLM_LLM()
+
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+# 我们所构造的 Prompt 模板
+template = """使用以下上下文来回答用户的问题。如果你不知道答案，就说你不知道。总是使用中文回答。
+问题: {question}
+可参考的上下文：
+···
+{context}
+···
+如果给定的上下文无法让你做出回答，请回答你不知道。
+有用的回答:"""
+
+# 调用 LangChain 的方法来实例化一个 Template 对象，该对象包含了 context 和 question 两个变量，在实际调用时，这两个变量会被检索到的文档片段和用户提问填充
+QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context","question"],template=template)
+
+
+
+qa_chain = RetrievalQA.from_chain_type(llm,retriever=vectordb.as_retriever(),return_source_documents=True,chain_type_kwargs={"prompt":QA_CHAIN_PROMPT})
+
+import gradio as gr
+with gr.Blocks(title="海关问答") as demo:    
     chatbot = gr.Chatbot(show_label=False)
     with gr.Row():
         with gr.Column(scale=5):
@@ -41,21 +109,30 @@ with gr.Blocks(title="海关问答") as demo:
         with gr.Column(scale=1,min_width=80):        
             submit = gr.Button("发送")
             clear = gr.Button("清除")
+        with gr.Column(scale=1,min_width=80):
+            chkdb = gr.Checkbox(True,label="知识库")    
 
     def user(user_message, history):
         return "", history + [[user_message, None]]
 
-    def bot(history):
-        history[-1][1] = ""
-        prompt = tm_model.model.get_prompt(combine_history(history))
-        input_ids = tm_model.tokenizer.encode(prompt)
-        for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
-            response = tm_model.tokenizer.decode(outputs[1])
-            history[-1][1] = response
+    def bot(history,chkdb):
+        print(chkdb)
+        if chkdb==True:
+            history[-1][1]=""
+            result = qa_chain({"query": history[-1][0]})
+            history[-1][1]=result["result"]
             yield history
+        else:
+            history[-1][1] = ""
+            prompt = tm_model.model.get_prompt(combine_history(history))
+            input_ids = tm_model.tokenizer.encode(prompt)
+            for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
+                response = tm_model.tokenizer.decode(outputs[1])
+                history[-1][1] = response
+                yield history
 
-    submit.click(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, chatbot, chatbot)
-    msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, chatbot, chatbot)
+    submit.click(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb], chatbot)
+    msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb], chatbot)
     clear.click(lambda: None, None, chatbot, queue=False)
 demo.queue()
 demo.launch()
