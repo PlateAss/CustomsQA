@@ -1,6 +1,6 @@
 # CustomsQA 外贸小助手
 
-[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)  
+[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)
 ![](assets/t1.png)
 
 ## 简介
@@ -28,17 +28,20 @@
 
 **代码说明：**
 
-app.py为代码主体。  
-requirements.txt为需要安装的python库。  
-chroma文件夹是根据上述内容生成的向量库。  
+app.py为代码主体。
+requirements.txt为需要安装的python库。
+chroma文件夹是根据上述内容生成的向量库。
 
-代码开发过程中使用了langchain、xtuner和lmdeploy。  
-以上库或者工具的具体使用方法请参考[教程](hhttps://github.com/InternLM/tutorial)  
+程序架构：
+![](assets/f1.png)
 
-**运行环境要求：**  
+代码开发过程中使用了[langchain](https://github.com/langchain-ai/langchain)、[xtuner](https://github.com/InternLM/xtuner)和[lmdeploy](https://github.com/InternLM/lmdeploy)，使用了[turbomind](https://github.com/InternLM/lmdeploy/blob/main/docs/en/inference/turbomind.md)推理引擎。
+以上库或者工具的具体使用方法请参考[教程](https://github.com/InternLM/tutorial)
 
-要求支持英伟达FastTransform的显卡(A100和A10等Volta和Turing架构GPU)，程序运行后占用显存约17GB。  
-本项目在A10(24GB)和A100(20GB)成功运行。  
+**运行环境要求：**
+
+要求支持英伟达FastTransform的显卡(A100和A10等Volta和Turing架构GPU)，程序运行后占用显存约17GB。
+本项目在A10(24GB)和A100(20GB)成功运行。
 
 **运行方式：**
 
@@ -60,4 +63,4 @@ python app.py
 
 ## 致谢
 
-感谢上海人工智能实验室组织的这次培训活动并无偿提供了算力平台！
+感谢上海人工智能实验室组织的[书生.浦语大模型实战训练营培训活动](https://github.com/InternLM/tutorial)并无偿提供了[算力平台](https://studio.intern-ai.org.cn/)！
