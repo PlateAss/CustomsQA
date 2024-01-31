@@ -1,6 +1,6 @@
 # CustomsQA 外贸小助手
 
-[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)
+[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)  
 ![](assets/t1.png)
 
 ## 简介
@@ -32,8 +32,8 @@ app.py为代码主体。
 requirements.txt为需要安装的python库。
 chroma文件夹是根据上述内容生成的向量库。
 
-代码使用中了langchain、xtuner和lmdeploy。
-以上库的具体使用方法请参考[教程](hhttps://github.com/InternLM/tutorial)  
+代码开发过程中使用了langchain、xtuner和lmdeploy。  
+以上库或者工具的具体使用方法请参考[教程](hhttps://github.com/InternLM/tutorial)  
 
 **运行环境要求：**  
 要求支持英伟达FastTransform的显卡(A100和A10等Volta和Turing架构GPU)，程序运行后占用显存约17GB。  
