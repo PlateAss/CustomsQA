@@ -36,6 +36,7 @@ chroma文件夹是根据上述内容生成的向量库。
 以上库或者工具的具体使用方法请参考[教程](hhttps://github.com/InternLM/tutorial)  
 
 **运行环境要求：**  
+
 要求支持英伟达FastTransform的显卡(A100和A10等Volta和Turing架构GPU)，程序运行后占用显存约17GB。  
 本项目在A10(24GB)和A100(20GB)成功运行。  
 
