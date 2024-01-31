@@ -1,6 +1,6 @@
 # CustomsQA 外贸小助手
 
-[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)
+[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)  
 ![](assets/t1.png)
 
 ## 简介
@@ -28,9 +28,9 @@
 
 **代码说明：**
 
-app.py为代码主体。
-requirements.txt为需要安装的python库。
-chroma文件夹是根据上述内容生成的向量库。
+app.py为代码主体。  
+requirements.txt为需要安装的python库。  
+chroma文件夹是根据上述内容生成的向量库。  
 
 程序架构：
 ![](assets/f1.png)
