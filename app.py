@@ -1,39 +1,25 @@
 import os
 xLab=0
 modelName="internlm2-chat-7b"
-modelpath=[f"/root/share/model_repos/{modelName}",f"/home/xlab-app-center/{modelName}"]
+modelPath=[f"/root/share/model_repos/{modelName}",f"/home/xlab-app-center/{modelName}"]
 sentencePath=["/root/data/model/sentence-transformer","/home/xlab-app-center/sentence-transformer"]
 if os.path.isdir("/home/xlab-app-center"):
     xLab=1
 from openxlab.model import download
 if xLab==1:
-    if os.path.isdir(f"{modelpath[xLab]}")==False:
-        download(model_repo=f'OpenLMLab/{modelName}', output=f"{modelpath[xLab]}")        
-        os.system(f"lmdeploy lite auto_awq {modelpath[xLab]} --work-dir {modelpath[xLab]}-4bits")
+    if os.path.isdir(f"{modelPath[xLab]}")==False:
+        download(model_repo=f'OpenLMLab/{modelName}', output=f"{modelPath[xLab]}")        
+        os.system(f"lmdeploy lite auto_awq {modelPath[xLab]} --work-dir {modelPath[xLab]}-4bits")
     # os.system(f"lmdeploy serve gradio {modelpath[xLab]}-4bits --server-port 7860 --model-format awq --backend turbomind")
 else:
     if os.path.isdir(f"./{modelName}-4bits")==False:        
-        os.system(f"lmdeploy lite auto_awq {modelpath[xLab]} --work-dir ./{modelName}-4bits")
+        os.system(f"lmdeploy lite auto_awq {modelPath[xLab]} --work-dir ./{modelName}-4bits")
     # os.system(f"lmdeploy serve gradio ./{modelName}-4bits --server-port 7860 --model-format awq --backend turbomind")
 if os.path.isdir(f"{sentencePath[xLab]}")==False:
     os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
     os.system(f'huggingface-cli download --resume-download sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 --local-dir {sentencePath[xLab]}')
 
 from lmdeploy import turbomind as tm
-
-user_prompt = "<|User|>:{user}\n"
-robot_prompt = "<|Bot|>:{robot}<eoa>\n"
-cur_query_prompt = "<|User|>:{user}<eoh>\n<|Bot|>:"
-
-def combine_history(history):
-    total_prompt = ""
-    for msg in history:
-        cur_prompt = user_prompt.replace("{user}", msg[0])
-        total_prompt += cur_prompt
-        cur_prompt = robot_prompt.replace("{robot}", msg[1])
-        total_prompt += cur_prompt
-    total_prompt += cur_query_prompt.replace("{user}", history[-1][0])
-    return total_prompt
 
 tm_model = tm.TurboMind.from_pretrained(f"{modelName}-4bits", model_name=modelName,trust_remote_code=True)
 generator = tm_model.create_instance()
@@ -43,7 +29,6 @@ import sys
 sys.modules['sqlite3']=sys.modules.pop('pysqlite3')
 from langchain.vectorstores import Chroma
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-
 # 定义 Embeddings
 embeddings = HuggingFaceEmbeddings(model_name=sentencePath[xLab])
 # 加载数据库
@@ -63,7 +48,7 @@ class InternLM_LLM(LLM):
                 run_manager: Optional[CallbackManagerForLLMRun] = None,
                 **kwargs: Any):
         # 重写调用函数
-        prompt_t = tm_model.model.get_prompt(prompt)
+        prompt_t = tm_model.model.get_prompt(prompt)        
         input_ids = tm_model.tokenizer.encode(prompt_t)
         for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
             response = tm_model.tokenizer.decode(outputs[1])            
@@ -90,12 +75,24 @@ template = """使用以下上下文来回答用户的问题。如果你不知道
 # 调用 LangChain 的方法来实例化一个 Template 对象，该对象包含了 context 和 question 两个变量，在实际调用时，这两个变量会被检索到的文档片段和用户提问填充
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context","question"],template=template)
 
-
-
 qa_chain = RetrievalQA.from_chain_type(llm,retriever=vectordb.as_retriever(),return_source_documents=True,chain_type_kwargs={"prompt":QA_CHAIN_PROMPT})
 
+user_prompt = "<|User|>:{user}\n"
+robot_prompt = "<|Bot|>:{robot}<eoa>\n"
+cur_query_prompt = "<|User|>:{user}<eoh>\n<|Bot|>:"
+
+def combine_history(history):
+    total_prompt = ""
+    for msg in history:
+        cur_prompt = user_prompt.replace("{user}", msg[0])
+        total_prompt += cur_prompt
+        cur_prompt = robot_prompt.replace("{robot}", msg[1])
+        total_prompt += cur_prompt
+    total_prompt += cur_query_prompt.replace("{user}", history[-1][0])
+    return total_prompt
+
 import gradio as gr
-with gr.Blocks(title="智贸辅助") as demo:    
+with gr.Blocks(title="外贸小助手") as demo:    
     chatbot = gr.Chatbot(show_label=False)
     with gr.Row():
         with gr.Column(scale=5):
@@ -104,29 +101,44 @@ with gr.Blocks(title="智贸辅助") as demo:
             submit = gr.Button("发送")
             clear = gr.Button("清除")
         with gr.Column(scale=1,min_width=80):
-            chkdb = gr.Checkbox(True,label="知识库")    
+            chkdb = gr.Checkbox(True,label="知识库")
+            if xLab==1:
+                debug = gr.Checkbox(False,label="调试模式",visible=False)
+            else:
+                debug = gr.Checkbox(True,label="调试模式")   
 
     def user(user_message, history):
+        if len(history)>10:
+            del history[0]
         return "", history + [[user_message, None]]
 
-    def bot(history,chkdb):
-        print(chkdb)
-        if chkdb==True:
+    def bot(history,chkdb,debug):
+        if debug==True:
             history[-1][1]=""
             result = qa_chain({"query": history[-1][0]})
-            history[-1][1]=result["result"]
-            yield history
-        else:
-            history[-1][1] = ""
             prompt = tm_model.model.get_prompt(combine_history(history))
             input_ids = tm_model.tokenizer.encode(prompt)
+            temp=""
             for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
                 response = tm_model.tokenizer.decode(outputs[1])
-                history[-1][1] = response
+                history[-1][1]=f"**检索知识库回答**:{result['result']}\n\n**大模型回答**:{response}"
                 yield history
-
-    submit.click(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb], chatbot)
-    msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb], chatbot)
+        else:
+            if chkdb==True:
+                history[-1][1]=""
+                result = qa_chain({"query": history[-1][0]})
+                history[-1][1]=result["result"]
+                yield history
+            else:
+                history[-1][1] = ""
+                prompt = tm_model.model.get_prompt(combine_history(history))
+                input_ids = tm_model.tokenizer.encode(prompt)
+                for outputs in generator.stream_infer(session_id=0,input_ids=[input_ids]):            
+                    response = tm_model.tokenizer.decode(outputs[1])
+                    history[-1][1] = response
+                    yield history
+    submit.click(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb,debug], chatbot)
+    msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(bot, [chatbot,chkdb,debug], chatbot)
     clear.click(lambda: None, None, chatbot, queue=False)
 demo.queue()
 demo.launch()
