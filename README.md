@@ -21,6 +21,7 @@
 - HS商品编码  
 
 **代码说明：**  
+
 app.py为代码主体  
 requirements.txt为需要安装的python库  
 chroma文件夹是根据上述内容生成的向量库  
