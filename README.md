@@ -28,9 +28,9 @@
 
 **代码说明：**
 
-app.py为代码主体。
-requirements.txt为需要安装的python库。
-chroma文件夹是根据上述内容生成的向量库。
+app.py为代码主体。  
+requirements.txt为需要安装的python库。  
+chroma文件夹是根据上述内容生成的向量库。  
 
 代码开发过程中使用了langchain、xtuner和lmdeploy。  
 以上库或者工具的具体使用方法请参考[教程](hhttps://github.com/InternLM/tutorial)  
