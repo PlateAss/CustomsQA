@@ -1,15 +1,10 @@
 # CustomsQA 外贸小助手
-[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://beta.openxlab.org.cn/apps/detail/mmpose/RTMPose)  
-![](assets/t1.png)
-
-## 简介
-
+[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/peek/CustomsQA)  
+![](assets/t1.png)  
+## 简介  
 使用上海人工智能实验室的Internlm2-chat-7b模型为基础，实现外贸相关知识的问答。
-
 ## 介绍
-
-**知识库包含的内容：**
-
+**知识库包含的内容：**  
 - 中华人民共和国海关法
 - 中华人民共和国海关关衔条例
 - 中华人民共和国船舶吨税法
@@ -23,12 +18,12 @@
 - 监管方式代码
 - 关区代码
 - 贸易便利化术语
-- HS商品编码
+- HS商品编码  
 
-**代码说明：**
-app.py为代码主体
-requirements.txt为需要安装的python库
-chroma文件夹是根据上述内容生成的向量库
+**代码说明：**  
+app.py为代码主体  
+requirements.txt为需要安装的python库  
+chroma文件夹是根据上述内容生成的向量库  
 
 **运行方式：**
 
@@ -36,5 +31,17 @@ chroma文件夹是根据上述内容生成的向量库
 pip install -r requirements.txt
 python app.py
 ```
+**运行截图：**
+![](assets/s1.png)  
+![](assets/s2.png)  
+![](assets/s3.png)  
 
+**遗留问题：**
+- 对于代码表之类的短语回答不准确。
+- 知识库的内容较少，需要进一步收集。
+- 问答形式微调效果不好，需要选择合适的问题，重新进行微调。
+
+## 致谢
+
+感谢上海人工智能实验室组织的这次培训活动并无偿提供了算力平台！
 
